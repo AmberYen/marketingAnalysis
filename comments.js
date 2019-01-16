@@ -21,7 +21,7 @@ export async function comments() {
     const result = [];
     let count = 0;
     const sendRequest = (after) => {
-      exec(`curl -k -X GET \ "https://graph.facebook.com/v3.1/556055591230516_1085716804931056/comments?fields=message%2Cmessage_tags%2Cfrom%2Cid%2Ccomments.limit(1000)%7Bmessage%2Cmessage_tags%2Cfrom%2Cid%7D&after=${after}&access_token=EAADjbBIIL4wBAGpXwfyJSyMFExEhZCjoKAbWJOJqh07lmJE5d8qWUUEhZBh19LVZC7DLq0oBV3nj5nLZBDZBU1zSaHGDG84RD33HzCQfRUZAOOFJIFzt6njbsZCf43wr2woUlnxZA1WiVWzwfF5C9VjmxiXoir0GvZBR0haEIxmGs9nNuE9JLOlxizmVxJq4Y23MZD"`, (err, stdout) => {
+      exec(`curl -k -X GET \ "https://graph.facebook.com/v3.1/1396075377331078_2193457230926218/comments?fields=message%2Cmessage_tags%2Cfrom%2Cid%2Ccomments.limit(1000)%7Bmessage%2Cmessage_tags%2Cfrom%2Cid%7D&after=${after}&access_token=EAADjbBIIL4wBAMEZCsqnydXHwPY56ckLl8q5bGUNZCMreruZC25Ygo8JYdQF72PxSxPlfe2TVcvVCZCAx3k6fHYXXFtSYDPUgO2FARpwmice8Hx5OaAMK6Vxf8rF062qqWBYedrCxNl52cqWuOvZAQ6mJp4gdROhdtLqrIgBN8m6qZB5zOnQe08tZA2ISBdpK331uZACVTWrlQZDZD"`, (err, stdout) => {
         if (err) {
           console.log('err', err);
           resolve([]);
@@ -46,7 +46,7 @@ export async function comments() {
       });
     }
 
-    sendRequest('NDgwMgZDZD');
+    sendRequest('MTMZD');
   });
 }
 
@@ -55,21 +55,24 @@ export async function comments() {
 
   const secondLayerComments = _.flatten(results.filter(result => result.comments !== undefined).map(result => result.comments.data));
 
+  //const data = results.concat(secondLayerComments);
+  //console.log('data', data);
+  // const HOMEData = data.filter(d => d.from && d.from.id === '556055591230516');
+  // console.log(HOMEData.length);
   const data = results.concat(secondLayerComments).map(result => ([
     `"${result.message}"`,
     `"${result.from && result.from.name}"`,
     result.from && result.from.id,
-    checkVoteStatus(result.message_tags) ? "Success" : "False",
     moment(result.created_time).format('YYYY-MM-DD HH:mm:ss'),
-  ]).join(',')).join('\n').replace(/^/, '留言內容,留言者資訊,留言時間\n');
-
+  ]).join(',')).join('\n').replace(/^/, '留言內容,留言者資訊,留言者ID,留言時間\n');
+  //
   // fixed MS Excel BOM Bug
   const msExcelBuffer = Buffer.concat([
     Buffer.from('\xEF\xBB\xBF', 'binary'),
     Buffer.from(data),
   ]);
-
-  fs.writeFile('comments.csv', msExcelBuffer, 'utf8', function (err) {
+  //
+  fs.writeFile('4_comments.csv', msExcelBuffer, 'utf8', function (err) {
     if (err) {
       console.log('Some error occured - file either not saved or corrupted file saved.');
     } else{
